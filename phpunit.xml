@@ -1,0 +1,14 @@
+<phpunit
+        colors="true"
+        stderr="true"
+        convertErrorsToExceptions="true"
+        convertNoticesToExceptions="true"
+        convertWarningsToExceptions="true"
+        stopOnFailure="false"
+        bootstrap="vendor/autoload.php">
+    <testsuites>
+        <testsuite name="Framework Tests">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

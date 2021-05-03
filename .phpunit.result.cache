@@ -1,0 +1,1 @@
+C:37:"PHPUnit\Runner\DefaultTestResultCache":235:{a:2:{s:7:"defects";a:1:{s:46:"HaloYa\Tests\TableGatewayTest::testFetchObject";i:5;}s:5:"times";a:2:{s:46:"HaloYa\Tests\TableGatewayTest::testFetchObject";d:0.001;s:55:"HaloYa\Tests\TableGatewayTest::testSetDatabaseConnector";d:0.001;}}}
