@@ -2,23 +2,24 @@
 
 use Exception;
 
-trait WhereTrait {
+trait WhereTrait
+{
 
     /**
      * @var Where
      */
-    protected $where;
+    protected Where $where;
 
     /**
      * @param array $conditions
      * @return $this
      * @throws Exception
      */
-    public function where($conditions) {
-        if (is_null($this->where)) {
+    public function where(array $conditions)
+    {
+        if (empty($this->where)) {
             $this->where = new Where($conditions);
-        }
-        else {
+        } else {
             $this->where->setConditions($conditions);
         }
         return $this;

@@ -10,7 +10,7 @@ class Equal extends Condition {
     /**
      * @return string
      */
-    public function __toString() {
+    public function __toString(): string {
         return static::OPERATOR . ':' . static::BIND_NAME;
     }
 }

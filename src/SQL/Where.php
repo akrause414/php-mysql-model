@@ -6,7 +6,8 @@ use HaloYa\SQL\Where\Condition\NotBetween;
 use HaloYa\TableGateway;
 use Exception;
 
-class Where {
+class Where
+{
 
     /**
      * @var string
@@ -16,22 +17,22 @@ class Where {
     /**
      * @var Condition[]
      */
-    protected $conditions;
+    protected array $conditions;
 
     /**
      * @var array
      */
-    protected $binds;
+    protected array $binds;
 
     /**
      * @var array
      */
-    protected $params;
+    protected array $params;
 
     /**
      * @var bool
      */
-    protected $hasCompiled;
+    protected bool $hasCompiled;
 
     /**
      * Where constructor
@@ -39,14 +40,16 @@ class Where {
      * @param array $conditions
      * @throws Exception
      */
-    public function __construct($conditions) {
+    public function __construct(array $conditions)
+    {
         $this->setConditions($conditions);
     }
 
     /**
      * @return array
      */
-    public function getParams() {
+    public function getParams(): array
+    {
         return $this->params;
     }
 
@@ -54,7 +57,8 @@ class Where {
      * @param array $conditions
      * @throws Exception
      */
-    public function setConditions($conditions) {
+    public function setConditions(array $conditions)
+    {
         foreach ($conditions as $dbField => $condition) {
             $this->addCondition($dbField, $condition);
         }
@@ -62,9 +66,11 @@ class Where {
 
     /**
      * @param TableGateway $tableGateway
+     * @throws Exception
      */
-    public function compile($tableGateway) {
-        if (!$this->hasCompiled) {
+    public function compile(TableGateway $tableGateway)
+    {
+        if (empty($this->hasCompiled)) {
             $this->binds = [];
             $this->params = [];
             if ($this->conditions) {
@@ -97,16 +103,14 @@ class Where {
                                 ],
                                 (string)$condition
                             );
-                        }
-                        else {
+                        } else {
                             $this->binds[] = str_replace(
                                 Condition\Condition::BIND_NAME,
                                 Helper::escape($value),
                                 (string)$condition
                             );
                         }
-                    }
-                    else {
+                    } else {
                         $this->binds[] = str_replace(
                             Condition\Condition::BIND_NAME,
                             $this->bindParam($value),
@@ -125,16 +129,19 @@ class Where {
      * @return Where
      * @throws Exception
      */
-    private function addCondition($dbField, $condition) {
-        $this->conditions[] = new Condition([$dbField => $condition]);
+    private function addCondition(string $dbField, array $condition): Where
+    {
+        $this->conditions[] = new Condition($dbField, $condition);
         return $this;
     }
 
     /**
      * @param mixed $value
      * @return string
+     * @throws Exception
      */
-    private function bindParam($value) {
+    private function bindParam($value): string
+    {
         $key = self::BIND_PREFIX . count($this->params);
         $this->params[$key] = Helper::escape($value);
         return $key;
@@ -143,7 +150,8 @@ class Where {
     /**
      * @return string
      */
-    public function __toString() {
+    public function __toString(): string
+    {
         if ($this->binds) {
             return 'WHERE ' . implode(' AND ', $this->binds);
         }

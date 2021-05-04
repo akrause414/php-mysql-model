@@ -2,7 +2,8 @@
 
 use Exception;
 
-class Model {
+class Model
+{
 
     /**
      * @var string
@@ -13,7 +14,8 @@ class Model {
      * @return TableGateway
      * @throws Exception
      */
-    public static function tableGateway() {
+    public static function tableGateway(): TableGateway
+    {
         $className = get_called_class();
         return TableGateway::getGatewayInstance(static::tableGateway, new $className());
     }
@@ -24,7 +26,8 @@ class Model {
      * @return $this
      * @throws Exception
      */
-    public static function fetchObjectByField($fieldName, $fieldValue) {
+    public static function fetchObjectByField(string $fieldName, $fieldValue)
+    {
         return self::tableGateway()->fetchObjectByField($fieldName, $fieldValue);
     }
 
@@ -33,7 +36,8 @@ class Model {
      * @return $this
      * @throws Exception
      */
-    public static function fetchObject($primaryKeyValue) {
+    public static function fetchObject($primaryKeyValue)
+    {
         return self::tableGateway()->fetchObject($primaryKeyValue);
     }
 }

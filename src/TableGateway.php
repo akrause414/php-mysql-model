@@ -5,7 +5,13 @@ use HaloYa\SQL\Select;
 use Exception;
 use HaloYa\TableGateway\DatabaseConnector;
 
-class TableGateway {
+class TableGateway
+{
+
+    /**
+     * The alias name of the database table
+     */
+    const tableAlias = 't';
 
     /**
      * The name of the database table
@@ -23,35 +29,32 @@ class TableGateway {
     const fieldMappings = [];
 
     /**
-     * Field mapping for joined tables
-     */
-    const joinMappings = [];
-
-    /**
      * Database connection instance that implements DatabaseConnector interface
      *
      * @var DatabaseConnector
      */
-    static private $dbConnector;
+    static private DatabaseConnector $dbConnector;
 
     /**
      * Database object container to cast data records to
      *
      * @var object
      */
-    protected $object;
+    protected object $object;
 
     /**
      * @param object $object
      */
-    public function __construct($object = null) {
+    public function __construct($object = null)
+    {
         $this->setObject($object);
     }
 
     /**
      * @return object
      */
-    public function getObject() {
+    public function getObject(): object
+    {
         return $this->object;
     }
 
@@ -59,7 +62,8 @@ class TableGateway {
      * @param $object
      * @return $this
      */
-    protected function setObject($object) {
+    protected function setObject($object): TableGateway
+    {
         $this->object = $object;
         return $this;
     }
@@ -68,7 +72,8 @@ class TableGateway {
      * @param DatabaseConnector $dbConnector
      * @throws Exception
      */
-    public static function setDatabaseConnector($dbConnector) {
+    public static function setDatabaseConnector(DatabaseConnector $dbConnector)
+    {
         if (!$dbConnector instanceof DatabaseConnector) {
             throw new Exception('Database connector class must implement DatabaseConnector interface');
         }
@@ -79,7 +84,8 @@ class TableGateway {
      * @return DatabaseConnector
      * @throws Exception
      */
-    public static function getDatabaseConnector() {
+    public static function getDatabaseConnector(): DatabaseConnector
+    {
         if (empty(self::$dbConnector)) {
             throw new Exception('Database connector has not been set');
         }
@@ -91,14 +97,16 @@ class TableGateway {
      *
      * @return string
      */
-    public function getPrimaryKey() {
+    public function getPrimaryKey(): string
+    {
         return static::primaryKey;
     }
 
     /**
      * @return string
      */
-    public function getTableName() {
+    public function getTableName(): string
+    {
         return static::tableName;
     }
 
@@ -107,7 +115,8 @@ class TableGateway {
      * @param mixed $value
      * @return mixed
      */
-    public function filterField($fieldName, $value) {
+    public function filterField(string $fieldName, $value)
+    {
         $fieldName = $this->getFieldAlias($fieldName);
         $filters = $this->getFilters();
         if (isset($filters[$fieldName])) {
@@ -121,7 +130,8 @@ class TableGateway {
     /**
      * @return array
      */
-    public function getFilters() {
+    public function getFilters(): array
+    {
         return [];
     }
 
@@ -130,7 +140,8 @@ class TableGateway {
      * @param mixed $value
      * @return mixed
      */
-    public function validateField($fieldName, $value) {
+    public function validateField(string $fieldName, $value)
+    {
         $fieldName = $this->getFieldAlias($fieldName);
         $validators = $this->getValidators();
         if (isset($validators[$fieldName])) {
@@ -144,7 +155,8 @@ class TableGateway {
     /**
      * @return array
      */
-    public function getValidators() {
+    public function getValidators(): array
+    {
         return [];
     }
 
@@ -152,7 +164,8 @@ class TableGateway {
      * @param string $fieldName
      * @return string
      */
-    public function getFieldAlias($fieldName) {
+    public function getFieldAlias(string $fieldName): string
+    {
         return in_array($fieldName, static::fieldMappings) ? array_search($fieldName, static::fieldMappings) : $fieldName;
     }
 
@@ -162,7 +175,8 @@ class TableGateway {
      * @param array $data
      * @return array
      */
-    public function getMappedData($data) {
+    public function getMappedData(array $data): array
+    {
         $mappedData = [];
         foreach ($data as $fieldName => $value) {
             $mappedData[$this->getMappedField($fieldName)] = $value;
@@ -176,7 +190,8 @@ class TableGateway {
      * @param string $fieldAliasName
      * @return bool
      */
-    public function hasMappedField($fieldAliasName) {
+    public function hasMappedField(string $fieldAliasName): bool
+    {
         return !empty(static::fieldMappings[$fieldAliasName]);
     }
 
@@ -186,8 +201,16 @@ class TableGateway {
      * @param string $fieldName
      * @return string
      */
-    public function getMappedField($fieldName) {
+    public function getMappedField(string $fieldName): string
+    {
         return $this->hasMappedField($fieldName) ? static::fieldMappings[$fieldName] : $fieldName;
+    }
+
+    /**
+     * @return array
+     */
+    public function getJoinConditions(): array {
+        return [];
     }
 
     /**
@@ -196,8 +219,9 @@ class TableGateway {
      * @param string $tableAliasName
      * @return bool
      */
-    public function hasMappedJoinCondition($tableAliasName) {
-        return !empty(static::joinMappings[$tableAliasName]);
+    public function hasMappedJoinCondition(string $tableAliasName): bool
+    {
+        return !empty($this->getJoinConditions()[$tableAliasName]);
     }
 
     /**
@@ -206,9 +230,10 @@ class TableGateway {
      * @param $tableAliasName
      * @return array
      */
-    public function getMappedJoinCondition($tableAliasName) {
+    public function getMappedJoinCondition($tableAliasName): array
+    {
         if ($this->hasMappedJoinCondition($tableAliasName)) {
-            return static::joinMappings[$tableAliasName];
+            return $this->getJoinConditions()[$tableAliasName];
         }
         return [];
     }
@@ -218,7 +243,8 @@ class TableGateway {
      *
      * @return array
      */
-    public function getMappedJoinConditions() {
+    public function getMappedJoinConditions(): array
+    {
         $conditions = [];
         if (
             $this->object instanceof NestedObjectMappings
@@ -236,7 +262,8 @@ class TableGateway {
      * @param string $tableAliasName
      * @return object|null
      */
-    public function getNestedJoinInstance($tableAliasName) {
+    public function getNestedJoinInstance(string $tableAliasName): ?object
+    {
         if ($this->object instanceof NestedObjectMappings) {
             if (!empty($class = $this->object->getNestedObjectsMappings()[$tableAliasName])) {
                 return new $class();
@@ -251,7 +278,8 @@ class TableGateway {
      * @return array
      * @throws Exception
      */
-    public function getSelectFields() {
+    public function getSelectFields(): array
+    {
         $fields = [];
         $objFields = array_keys(
             get_object_vars(
@@ -276,7 +304,8 @@ class TableGateway {
      * @return array
      * @throws Exception
      */
-    public function getSelectJoinFields($tableAliasName) {
+    public function getSelectJoinFields(string $tableAliasName): array
+    {
         $fields = [];
         if (
             $this->object instanceof NestedObjectMappings &&
@@ -296,7 +325,8 @@ class TableGateway {
      * @return Model
      * @throws Exception
      */
-    public function fetchObject($primaryKeyValue) {
+    public function fetchObject($primaryKeyValue): Model
+    {
         return $this->fetchObjectByField(
             $this->getPrimaryKey(),
             $primaryKeyValue
@@ -309,7 +339,8 @@ class TableGateway {
      * @return Model
      * @throws Exception
      */
-    public function fetchObjectByField($field, $value) {
+    public function fetchObjectByField(string $field, $value): Model
+    {
         $select = new Select(
             $this->getTableName(),
             $this->getSelectFields()
@@ -392,7 +423,8 @@ class TableGateway {
      * @param mixed $data
      * @return mixed
      */
-    public function transform($data) {
+    public function transform($data)
+    {
         if (
             $data &&
             $this->object instanceof NestedObjectMappings
@@ -417,7 +449,8 @@ class TableGateway {
      * @param mixed $object
      * @return mixed
      */
-    private function transformObjectProperties($object) {
+    private function transformObjectProperties($object)
+    {
         if (is_object($object)) {
             $nestedObjRef = null;
             $objectProperties = array_filter(
@@ -476,7 +509,8 @@ class TableGateway {
      * @return TableGateway
      * @throws Exception
      */
-    public static function getGatewayInstance($gatewayClass, $object = null, $cacheTtl = 0) {
+    public static function getGatewayInstance(string $gatewayClass, $object = null, $cacheTtl = 0): TableGateway
+    {
         if (
             !(
                 $gateway = new $gatewayClass($object, $cacheTtl)
@@ -492,7 +526,8 @@ class TableGateway {
      * @return TableGateway
      * @throws Exception
      */
-    public static function getInstanceGatewayInstance($objectClass) {
+    public static function getInstanceGatewayInstance(string $objectClass): TableGateway
+    {
         if (
             !(
                 $gateway = call_user_func([$objectClass, 'tableGateway'])

@@ -4,7 +4,8 @@ use HaloYa\SQL\Join\Builder;
 use HaloYa\TableGateway;
 use Exception;
 
-class Select {
+class Select
+{
 
     use WhereTrait;
     use GroupByTrait;
@@ -14,19 +15,19 @@ class Select {
     /**
      * @var string
      */
-    protected $tableName;
+    protected string $tableName;
 
     /**
      * Associative array with keys as alias and values as database field names
      *
      * @var string[]
      */
-    protected $fields = [];
+    protected array $fields = [];
 
     /**
      * @var Join[]
      */
-    protected $joins = [];
+    protected array $joins = [];
 
     /**
      * Select constructor
@@ -34,7 +35,8 @@ class Select {
      * @param string $tableName
      * @param string[] $fields
      */
-    public function __construct($tableName, $fields) {
+    public function __construct(string $tableName, array $fields)
+    {
         $this->tableName = $tableName;
         $this->fields = $fields;
     }
@@ -45,12 +47,17 @@ class Select {
      * @return Select
      * @throws Exception
      */
-    public function Join($tableAliasName, $condition) {
+    public function Join(string $tableAliasName, array $condition): Select
+    {
         $this->joins[] = Builder::getJoin($tableAliasName, $condition);
         return $this;
     }
 
-    private function getJoins() {
+    /**
+     * @return string
+     */
+    private function getJoins(): string
+    {
         $joins = [];
         if ($this->joins) {
             foreach ($this->joins as $join) {
@@ -63,12 +70,13 @@ class Select {
     /**
      * @return string
      */
-    private function getReturnFields() {
+    private function getReturnFields(): string
+    {
         $fields = [];
         if ($this->fields) {
             foreach ($this->fields as $alias => $dbField) {
                 if (!strpos($dbField, '.')) {
-                    $dbField = "t.$dbField";
+                    $dbField = TableGateway::tableAlias . ".$dbField";
                 }
                 $field = Helper::escapeField($dbField);
                 if ($alias && is_string($alias) && $alias != $dbField) {
@@ -76,8 +84,7 @@ class Select {
                 }
                 $fields[] = $field;
             }
-        }
-        else {
+        } else {
             $fields[] = '*';
         }
         return implode(', ', $fields);
@@ -87,7 +94,8 @@ class Select {
      * @param TableGateway $tableGateway
      * @return Select
      */
-    public function compile($tableGateway) {
+    public function compile(TableGateway $tableGateway): Select
+    {
         if ($this->where) {
             $this->where->compile($tableGateway);
         }
@@ -97,7 +105,8 @@ class Select {
     /**
      * @return array
      */
-    public function getParams() {
+    public function getParams(): array
+    {
         if ($this->where) {
             return $this->where->getParams();
         }
@@ -107,7 +116,8 @@ class Select {
     /**
      * @return string
      */
-    public function __toString() {
+    public function __toString(): string
+    {
         return implode(
             ' ',
             array_filter([

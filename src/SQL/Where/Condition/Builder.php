@@ -2,7 +2,8 @@
 
 use Exception;
 
-class Builder {
+class Builder
+{
 
     const OPERATORS_CLASS = [
         self::OPERATOR_EQUAL_TO => Equal::class,
@@ -25,31 +26,10 @@ class Builder {
      * @return Condition
      * @throws Exception
      */
-    public static function getCondition($condition) {
-        if (
-            is_array($condition) &&
-            count($condition) === 1
-        ) {
-            $conditionField = null;
-            try {
-                foreach ($condition as $field => $value) {
-                    if (!$conditionField = $field) {
-                        throw new Exception('Expecting condition field');
-                    }
-                    if (is_array($value)) {
-                        foreach ($value as $key => $val) {
-                            return self::buildCondition($key, $val);
-                        }
-                        return new In($value);
-                    }
-                    else {
-                        return new Equal($value);
-                    }
-                }
-            }
-            catch (Exception $e) {
-                throw new Exception("Unexpected condition for field $conditionField: {$e->getMessage()}");
-            }
+    public static function getCondition(array $condition): Condition
+    {
+        foreach ($condition as $operator => $value) {
+            return self::buildCondition($operator, $value);
         }
         throw new Exception('Unexpected condition');
     }
@@ -58,7 +38,8 @@ class Builder {
      * @param mixed $operator
      * @return string
      */
-    public static function getOperator($operator) {
+    public static function getOperator($operator): string
+    {
         if (is_string($operator)) {
             $operator = strtoupper($operator);
             if (!empty(self::OPERATORS_CLASS[$operator])) {
@@ -74,14 +55,20 @@ class Builder {
      * @return Condition|null
      * @throws Exception
      */
-    private static function buildCondition($operator, $value) {
-        if ($operator = self::getOperator($operator)) {
+    private static function buildCondition($operator, $value): ?Condition
+    {
+        if (
+            $operator &&
+            $operator = self::getOperator($operator)
+        ) {
             $class = self::OPERATORS_CLASS[$operator];
             return new $class($value);
         }
         else if (is_string($operator)) {
             throw new Exception("Unknown operator: $operator");
         }
-        throw new Exception("Invalid operator");
+        else {
+            return new Equal($value);
+        }
     }
 }

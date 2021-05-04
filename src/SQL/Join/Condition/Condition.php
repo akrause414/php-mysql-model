@@ -1,25 +1,31 @@
-<?php namespace HaloYa\SQL\Where\Condition;
+<?php
+
+
+namespace HaloYa\SQL\Join\Condition;
+
 
 class Condition
 {
-
-    const BIND_NAME = 'value_bind';
-
-    const OPERATOR = '';
-
     /**
      * @var mixed
      */
     protected $value;
 
     /**
+     * @var string
+     */
+    protected string $operator;
+
+    /**
      * Equal constructor
      *
      * @param mixed $value
+     * @param string $operator
      */
-    public function __construct($value)
+    public function __construct($value, string $operator)
     {
         $this->value = $value;
+        $this->operator = $operator;
     }
 
     /**
@@ -27,7 +33,7 @@ class Condition
      */
     public function getOperator(): string
     {
-        return static::OPERATOR;
+        return $this->operator;
     }
 
     /**
@@ -43,6 +49,6 @@ class Condition
      */
     public function __toString(): string
     {
-        return static::OPERATOR . static::BIND_NAME;
+        return "{$this->getOperator()} " . (string)$this->value;
     }
 }

@@ -1,5 +1,6 @@
 <?php namespace HaloYa\Example\TableGateway;
 
+use HaloYa\SQL\Component\Field;
 use HaloYa\TableGateway;
 
 class Bar extends TableGateway {
@@ -41,13 +42,16 @@ class Bar extends TableGateway {
      * This is used in JOIN statements
      *  EX: LEFT JOIN foo ON foo_id = foo.key
      *
-     * @var array
+     * @return array
      */
-    const joinMappings = [
-        'foo' => [
-            'foo_id' => [
-                '=' => Foo::tableName . '.' . Foo::primaryKey
+    public function getJoinConditions(): array
+    {
+        return [
+            'foo' => [
+                'foo_id' => [
+                    '=' => new Field(Foo::primaryKey, Foo::tableName)
+                ]
             ]
-        ]
-    ];
+        ];
+    }
 }

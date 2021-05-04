@@ -1,6 +1,7 @@
 <?php namespace HaloYa\SQL;
 
-use Exception;
+use HaloYa\SQL\Component\Table;
+use HaloYa\SQL\Join\Condition\On;
 
 class Join {
 
@@ -10,51 +11,38 @@ class Join {
     const type = 'LEFT';
 
     /**
-     * @var string
+     * @var Table
      */
-    protected $tableName;
+    protected Table $table;
 
     /**
-     * @var string
+     * @var On
      */
-    protected $tableAliasName;
-
-    /**
-     * @var array
-     */
-    protected $condition;
+    protected On $on;
 
     /**
      * Join constructor
      *
-     * @param string|string[] $tableName
-     * @param array $condition
-     * @throws Exception
+     * @param Table $table
+     * @param On $on
      */
-    public function __construct($tableName, $condition) {
-        if (
-            is_array($tableName) &&
-            count($tableName) === 1
-        ) {
-            $this->tableAliasName = (string)array_keys($tableName)[0];
-            $this->tableName = (string)array_pop($tableName);
-        }
-        else if (is_string($tableName)) {
-            $this->tableName = $tableName;
-        }
-        else {
-            throw new Exception('Invalid table');
-        }
-        $this->condition = $condition;
+    public function __construct(Table $table, On $on) {
+        $this->table = $table;
+        $this->on = $on;
     }
 
     /**
      * @return string
      */
     public function __toString() {
-        $field = array_keys($this->condition)[0];
-        $operator = array_keys($this->condition[$field])[0];
-        $joinField = Helper::escapeField($this->condition[$field][$operator]);
-        return static::type . " JOIN {$this->tableName} {$this->tableAliasName} ON t.$field $operator " . str_replace($this->tableName, $this->tableAliasName, $joinField);
+        return implode(
+            ' ',
+            [
+                static::type,
+                'JOIN',
+                (string)$this->table,
+                (string)$this->on
+            ]
+        );
     }
 }

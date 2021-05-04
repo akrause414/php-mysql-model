@@ -5,7 +5,6 @@ use HaloYa\Example\Model\Foo;
 use HaloYa\TableGateway;
 use HaloYa\Tests\Mock;
 use PHPUnit\Framework\TestCase;
-use Exception;
 
 class TableGatewayTest extends TestCase {
 
@@ -17,13 +16,6 @@ class TableGatewayTest extends TestCase {
     public static function setUpBeforeClass():void {
         parent::setUpBeforeClass();
         TableGateway::setDatabaseConnector(self::$db = new Mock\TestDatabaseConnector());
-    }
-
-    public function testSetDatabaseConnector() {
-        $this->expectException(Exception::class);
-        TableGateway::setDatabaseConnector(
-            'nonsense'
-        );
     }
 
     public function testFetchObject() {
@@ -40,7 +32,7 @@ class TableGatewayTest extends TestCase {
         );
         $response = Bar::fetchObject(1);
         $this->assertEquals(
-            'SELECT t.`id` AS `id`, t.`name` AS `name`, foo.`key` AS `foo_id`, foo.`value` AS `foo_name` FROM bar t LEFT JOIN foo foo ON t.foo_id = foo.`key` WHERE `id` =:w0',
+            'SELECT t.`id` AS `id`, t.`name` AS `name`, foo.`key` AS `foo_id`, foo.`value` AS `foo_name` FROM bar t LEFT JOIN foo ON t.`foo_id` = foo.`key` WHERE `id` =:w0',
             self::$db->getLastSql()
         );
         $this->assertEquals($this->getBarMock(), $response);

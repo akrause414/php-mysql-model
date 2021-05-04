@@ -1,7 +1,5 @@
 <?php namespace HaloYa\SQL\Where\Condition;
 
-use HaloYa\SQL\Helper;
-
 class In extends Condition {
 
     /**
@@ -12,7 +10,7 @@ class In extends Condition {
     /**
      * @return string
      */
-    public function __toString() {
+    public function __toString(): string {
         return static::OPERATOR . '(:' . static::BIND_NAME . ')';
     }
 }
